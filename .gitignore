@@ -1,0 +1,7 @@
+.blip/
+broonie
+*.db
+*.db-shm
+*.db-wal
+helper/
+result/
