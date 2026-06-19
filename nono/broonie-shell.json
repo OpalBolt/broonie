@@ -1,0 +1,10 @@
+{
+  "$schema": "https://nono.sh/schemas/nono-profile.schema.json",
+  "extends": "broonie",
+  "meta": {
+    "name": "broonie-shell",
+    "description": "Broonie sandbox for shell-only tasks. No language toolchain.",
+    "author": "OpalBolt"
+  },
+  "groups": {}
+}

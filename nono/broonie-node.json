@@ -1,0 +1,12 @@
+{
+  "$schema": "https://nono.sh/schemas/nono-profile.schema.json",
+  "extends": "broonie",
+  "meta": {
+    "name": "broonie-node",
+    "description": "Broonie sandbox for Node.js projects.",
+    "author": "OpalBolt"
+  },
+  "groups": {
+    "include": ["node_runtime"]
+  }
+}

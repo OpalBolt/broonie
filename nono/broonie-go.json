@@ -1,0 +1,12 @@
+{
+  "$schema": "https://nono.sh/schemas/nono-profile.schema.json",
+  "extends": "broonie",
+  "meta": {
+    "name": "broonie-go",
+    "description": "Broonie sandbox for Go projects.",
+    "author": "OpalBolt"
+  },
+  "groups": {
+    "include": ["go_runtime"]
+  }
+}

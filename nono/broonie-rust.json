@@ -1,0 +1,12 @@
+{
+  "$schema": "https://nono.sh/schemas/nono-profile.schema.json",
+  "extends": "broonie",
+  "meta": {
+    "name": "broonie-rust",
+    "description": "Broonie sandbox for Rust projects.",
+    "author": "OpalBolt"
+  },
+  "groups": {
+    "include": ["rust_runtime"]
+  }
+}

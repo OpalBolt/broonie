@@ -1,0 +1,57 @@
+{
+  "$schema": "https://nono.sh/schemas/nono-profile.schema.json",
+  "extends": "default",
+  "meta": {
+    "name": "broonie",
+    "description": "Core sandbox for broonie agent pipeline. Toolchain-agnostic — use broonie-{go,rust,python,node,shell}.json for language-specific profiles.",
+    "author": "OpalBolt"
+  },
+  "groups": {
+    "include": [
+      "nix_runtime",
+      "git_config",
+      "unlink_protection"
+    ]
+  },
+  "security": {
+    "signal_mode": "isolated",
+    "capability_elevation": false
+  },
+  "filesystem": {
+    "allow": [
+      "$HOME/.pi",
+      "$NONO_CONFIG/profile-drafts",
+      "/tmp"
+    ],
+    "read": [
+      "$HOME/.nvm",
+      "$HOME/.cache/nix",
+      "$NONO_PACKAGES",
+      "$NONO_CONFIG/profiles",
+      "$WORKDIR/.."
+    ],
+    "suppress_save_prompt": [
+      "$NONO_PACKAGES/always-further/pi"
+    ]
+  },
+  "workdir": { "access": "readwrite" },
+  "open_urls": {
+    "allow_origins": [
+      "https://auth.openai.com",
+      "https://claude.ai",
+      "https://github.com"
+    ],
+    "allow_localhost": true
+  },
+  "allow_launch_services": true,
+  "undo": {
+    "exclude_patterns": [
+      "node_modules",
+      ".next",
+      "__pycache__",
+      "target",
+      ".pi"
+    ],
+    "exclude_globs": ["*.tmp.[0-9]*.[0-9]*"]
+  }
+}

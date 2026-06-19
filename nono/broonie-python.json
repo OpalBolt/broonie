@@ -1,0 +1,12 @@
+{
+  "$schema": "https://nono.sh/schemas/nono-profile.schema.json",
+  "extends": "broonie",
+  "meta": {
+    "name": "broonie-python",
+    "description": "Broonie sandbox for Python projects.",
+    "author": "OpalBolt"
+  },
+  "groups": {
+    "include": ["python_runtime"]
+  }
+}
