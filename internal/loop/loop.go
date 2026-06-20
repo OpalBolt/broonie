@@ -10,12 +10,14 @@ import (
 	"time"
 
 	"github.com/OpalBolt/broonie/internal/config"
+	"github.com/OpalBolt/broonie/internal/db"
+	"github.com/OpalBolt/broonie/internal/gh"
 )
 
 // Run starts the main polling loop.
 // It queries repos from the database and polls them on the configured interval.
 // Gracefully shuts down on SIGINT/SIGTERM.
-func Run(db *sql.DB, cfg config.Config) {
+func Run(database *sql.DB, cfg config.Config) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -36,21 +38,48 @@ func Run(db *sql.DB, cfg config.Config) {
 		default:
 		}
 
-		// Query number of active repos
-		var repoCount int
-		err := db.QueryRow("SELECT COUNT(*) FROM repos WHERE active = 1").Scan(&repoCount)
-		if err != nil {
-			log.Printf("Error counting repos: %v\n", err)
-			repoCount = 0
-		}
-
-		log.Printf("Watching %d repos\n", repoCount)
+		pollRepos(ctx, database, cfg)
 
 		// Sleep for the configured interval
 		select {
 		case <-ctx.Done():
 			return
 		case <-time.After(cfg.PollInterval):
+		}
+	}
+}
+
+// pollRepos iterates active repos, polls GitHub, and logs the next pending issue.
+func pollRepos(ctx context.Context, database *sql.DB, cfg config.Config) {
+	repos, err := db.ListActiveRepos(database)
+	if err != nil {
+		log.Printf("Error listing repos: %v", err)
+		return
+	}
+
+	log.Printf("Watching %d repos", len(repos))
+
+	for _, repo := range repos {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+		}
+
+		client, err := gh.NewClient(repo, cfg.EncryptionKey)
+		if err != nil {
+			log.Printf("Skipping %s/%s: %v", repo.Owner, repo.Name, err)
+			continue
+		}
+
+		issue, err := gh.Poll(ctx, client, repo, database)
+		if err != nil {
+			log.Printf("Poll error for %s/%s: %v", repo.Owner, repo.Name, err)
+			continue
+		}
+
+		if issue != nil {
+			log.Printf("Selected %s/%s#%d: %s", repo.Owner, repo.Name, issue.IssueNumber, issue.Title)
 		}
 	}
 }
