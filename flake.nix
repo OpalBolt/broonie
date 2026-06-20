@@ -56,6 +56,8 @@
               pkgs.gopls
               pkgs.podman
               gomod2nix.packages.${system}.default
+              (pkgs.python3.withPackages (ps: [ ps.cryptography ps.requests ]))
+              pkgs.sqlite
             ];
           };
         }

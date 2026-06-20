@@ -13,22 +13,30 @@ The system is intentionally split into two concerns:
 
 ## Issue Format
 
-Issues are authored with YAML frontmatter in the issue body. Two fields are required for v1, more can be added later.
+Issues carry machine-readable metadata in a collapsed `<details>` block at the top of the body. Humans don't see it by default; the poller finds it by scanning for the block.
 
-```yaml
----
-type: AUTO | HITL
-depends-on: ["#12", "#15"]
----
+````markdown
+<details>
+<summary>Metadata</summary>
+
+```json
+{
+  "type": "AUTO",
+  "depends-on": ["#12", "#15"]
+}
+```
+
+</details>
 
 Normal issue body follows here.
-```
+````
 
 - **`type: AUTO`** — the agent pipeline picks this up and implements it
 - **`type: HITL`** — Human in the Loop; the system skips this issue until a human acts on it
 - **`depends-on`** — list of issue numbers that must be closed before this one is worked on
+- Unknown JSON keys are ignored (forward-compatible)
 
-A server-side validator (triggered on issue create/edit via GitHub webhook, or on each poll cycle) checks frontmatter validity. Malformed issues are labeled `invalid-frontmatter`.
+A server-side validator (triggered on each poll cycle) checks metadata validity. Malformed issues are labeled `invalid-frontmatter`.
 
 ### Issue Creation
 

@@ -67,3 +67,97 @@ CREATE INDEX IF NOT EXISTS idx_runs_issue_id ON runs(issue_id);
 
 	return db, nil
 }
+
+// Repo represents a watched GitHub repository.
+type Repo struct {
+	ID              int64
+	Owner           string
+	Name            string
+	TokenEnc        []byte
+	PollIntervalSec int
+	Active          bool
+}
+
+// Issue represents a mirrored GitHub issue.
+type Issue struct {
+	ID          int64
+	RepoID      int64
+	IssueNumber int
+	Title       string
+	Type        string
+	Status      string
+	DependsOn   string
+}
+
+// ListActiveRepos returns all active repos from the database.
+func ListActiveRepos(db *sql.DB) ([]Repo, error) {
+	rows, err := db.Query("SELECT id, owner, name, token_enc, poll_interval_sec, active FROM repos WHERE active = 1")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var repos []Repo
+	for rows.Next() {
+		var r Repo
+		if err := rows.Scan(&r.ID, &r.Owner, &r.Name, &r.TokenEnc, &r.PollIntervalSec, &r.Active); err != nil {
+			return nil, err
+		}
+		repos = append(repos, r)
+	}
+	return repos, rows.Err()
+}
+
+// UpsertIssue inserts or updates an issue in the database.
+func UpsertIssue(db *sql.DB, issue Issue) error {
+	_, err := db.Exec(`
+		INSERT INTO issues (repo_id, issue_number, title, type, status, depends_on)
+		VALUES (?, ?, ?, ?, ?, ?)
+		ON CONFLICT(repo_id, issue_number) DO UPDATE SET
+			title = excluded.title,
+			type = excluded.type,
+			status = excluded.status,
+			depends_on = excluded.depends_on
+	`, issue.RepoID, issue.IssueNumber, issue.Title, issue.Type, issue.Status, issue.DependsOn)
+	return err
+}
+
+// GetPendingIssue returns the first pending AUTO issue for a repo, oldest first.
+func GetPendingIssue(db *sql.DB, repoID int64) (*Issue, error) {
+	var i Issue
+	err := db.QueryRow(`
+		SELECT id, repo_id, issue_number, title, type, status, depends_on
+		FROM issues
+		WHERE repo_id = ? AND status = 'pending' AND type = 'AUTO'
+		ORDER BY issue_number ASC
+		LIMIT 1
+	`, repoID).Scan(&i.ID, &i.RepoID, &i.IssueNumber, &i.Title, &i.Type, &i.Status, &i.DependsOn)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &i, nil
+}
+
+// AreDepsDone checks whether all dependency issue numbers have status 'done'.
+func AreDepsDone(db *sql.DB, repoID int64, depNumbers []int) (bool, error) {
+	if len(depNumbers) == 0 {
+		return true, nil
+	}
+	for _, n := range depNumbers {
+		var status string
+		err := db.QueryRow("SELECT status FROM issues WHERE repo_id = ? AND issue_number = ?", repoID, n).Scan(&status)
+		if err == sql.ErrNoRows {
+			return false, nil // dep not yet mirrored
+		}
+		if err != nil {
+			return false, err
+		}
+		if status != "done" {
+			return false, nil
+		}
+	}
+	return true, nil
+}
