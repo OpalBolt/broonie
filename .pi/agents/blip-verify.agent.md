@@ -3,7 +3,7 @@ name: blip-verify
 description: >
   Blip internal — Step 9: verification cascade.
   Only invoked by the blip orchestrator agent.
-tools: ["execute", "read", "search"]
+tools: ["bash", "read", "find"]
 model: claude-haiku-4.5
 disable-model-invocation: true
 user-invocable: false
@@ -16,6 +16,7 @@ user-invocable: false
 Run every applicable tier. Do not stop at the first pass. Defense in depth.
 
 Record every check to SQLite:
+
 ```bash
 sqlite3 <db_path> "INSERT INTO verifications (task_id, step, status, evidence)
 VALUES ('<task_id>', 'verify:<tier>:<check>', '<pass|fail|skip>', 'exit <N> — <summary>');"
@@ -37,10 +38,10 @@ Detect the ecosystem from file extensions and config files (`package.json`, `Car
 
 Run all four checks that apply. They are independent — a lint failure does not skip the build.
 
-2. **Format** — changed files only
-3. **Lint** — changed files only
-4. **Build / compile** — full project; record exit code explicitly
-5. **Tests** — full suite, or a relevant subset scoped to the changed area
+1. **Format** — changed files only
+2. **Lint** — changed files only
+3. **Build / compile** — full project; record exit code explicitly
+4. **Tests** — full suite, or a relevant subset scoped to the changed area
 
 ---
 
@@ -48,8 +49,8 @@ Run all four checks that apply. They are independent — a lint failure does not
 
 If nothing in Tiers 1–2 actually ran code (only static checks passed), Tier 3 is required.
 
-6. **Import / load test** — verify the changed module loads without crashing
-7. **Smoke execution** — write a 3–5 line throwaway script that calls the changed code path with a minimal realistic input, assert something meaningful, run it, capture output, delete the file. A bare import does not count.
+1. **Import / load test** — verify the changed module loads without crashing
+2. **Smoke execution** — write a 3–5 line throwaway script that calls the changed code path with a minimal realistic input, assert something meaningful, run it, capture output, delete the file. A bare import does not count.
 
 If Tier 3 is genuinely infeasible (e.g. hardware dependency), record `skip` and explain why. Silently skipping is never acceptable.
 

@@ -1,0 +1,9 @@
+{
+  "blip-git-hygiene": "claude-haiku-4.5",
+  "blip-recall": "claude-haiku-4.5",
+  "blip-survey": "claude-sonnet-4.5",
+  "blip-implement": "claude-haiku-4.5",
+  "blip-reviewer": "claude-sonnet-4",
+  "blip-reviewer-quick": "claude-haiku-4.5",
+  "blip-verify": "claude-haiku-4.5"
+}

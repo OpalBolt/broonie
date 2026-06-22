@@ -3,7 +3,7 @@ name: blip-recall
 description: >
   Blip internal — Step 4: session history recall. Runs in parallel with Step 3.
   Only invoked by the blip orchestrator agent.
-tools: ["execute"]
+tools: ["bash"]
 model: claude-haiku-4.5
 disable-model-invocation: true
 user-invocable: false
@@ -27,6 +27,7 @@ LIMIT 30;"
 Fallback: `tail -50 .blip/session.jsonl 2>/dev/null`
 
 Look for:
+
 1. **Similar past work** — has this been done before? What approach was used?
 2. **Failure patterns** — steps that have repeatedly failed, problem areas
 3. **Reusable utilities** — verified helpers the current task could reuse
@@ -34,6 +35,7 @@ Look for:
 If the database is empty, note it's a fresh session.
 
 Return:
+
 ```
 session_history:
   similar_work: <description or "none">

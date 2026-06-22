@@ -3,7 +3,7 @@ name: blip-implement
 description: >
   Blip internal — Step 7: execute the implementation plan.
   Only invoked by the blip orchestrator agent.
-tools: ["read", "edit", "search", "execute"]
+tools: ["read", "write", "edit", "bash"]
 model: claude-haiku-4.5
 disable-model-invocation: true
 user-invocable: false
@@ -23,6 +23,7 @@ VALUES ('<task_id>', 'implement:<filename>', 'pass', '<one-line description of c
 Fallback: append JSON to `.blip/session.jsonl`.
 
 **If the plan is ambiguous** — stop and return:
+
 ```
 status: blocked
 file: <filename>
@@ -35,6 +36,7 @@ Don't guess. A wrong implementation is worse than a paused one.
 **If the file conflicts with the plan** — minor conflict (renamed function etc): adapt and note it. Significant conflict (changes what the plan means): return `status: blocked`.
 
 Return:
+
 ```
 status: complete
 files_changed:

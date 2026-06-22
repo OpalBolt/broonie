@@ -4,7 +4,7 @@ description: >
   Blip internal — Step 8 (surface): fast parallel reviewer for Large tasks.
   Checks style regressions, obvious issues, naming, and formatting.
   Only invoked by the blip orchestrator agent alongside blip-reviewer.
-tools: ["read"]
+tools: ["read", "bash", "grep", "find"]
 model: claude-haiku-4.5
 disable-model-invocation: true
 user-invocable: false
