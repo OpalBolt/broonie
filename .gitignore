@@ -5,3 +5,4 @@ broonie
 *.db-wal
 helper/
 result/
+.blip/
