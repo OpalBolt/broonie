@@ -4,7 +4,7 @@ description: >
   Blip internal — Step 8: adversarial code reviewer.
   Only invoked by the blip orchestrator agent.
 tools: ["read", "bash", "grep", "find"]
-model: claude-sonnet-4
+model: MODEL_REVIEWER
 disable-model-invocation: true
 user-invocable: false
 ---

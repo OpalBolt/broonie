@@ -1,9 +1,9 @@
 {
-  "blip-git-hygiene": "claude-haiku-4.5",
-  "blip-recall": "claude-haiku-4.5",
-  "blip-survey": "claude-sonnet-4.5",
-  "blip-implement": "claude-haiku-4.5",
-  "blip-reviewer": "claude-sonnet-4",
-  "blip-reviewer-quick": "claude-haiku-4.5",
-  "blip-verify": "claude-haiku-4.5"
+  "MODEL_GIT_HYGIENE": "claude-haiku-4.5",
+  "MODEL_RECALL": "claude-haiku-4.5",
+  "MODEL_SURVEY": "claude-sonnet-4.5",
+  "MODEL_IMPLEMENT": "claude-haiku-4.5",
+  "MODEL_REVIEWER": "claude-sonnet-4",
+  "MODEL_REVIEWER_QUICK": "claude-haiku-4.5",
+  "MODEL_VERIFY": "claude-haiku-4.5"
 }

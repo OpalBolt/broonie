@@ -4,7 +4,7 @@ description: >
   Blip internal — Step 4: session history recall. Runs in parallel with Step 3.
   Only invoked by the blip orchestrator agent.
 tools: ["bash"]
-model: claude-haiku-4.5
+model: MODEL_RECALL
 disable-model-invocation: true
 user-invocable: false
 ---

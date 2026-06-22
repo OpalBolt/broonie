@@ -5,7 +5,7 @@ description: >
   Checks style regressions, obvious issues, naming, and formatting.
   Only invoked by the blip orchestrator agent alongside blip-reviewer.
 tools: ["read", "bash", "grep", "find"]
-model: claude-haiku-4.5
+model: MODEL_REVIEWER_QUICK
 disable-model-invocation: true
 user-invocable: false
 ---

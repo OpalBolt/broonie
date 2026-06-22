@@ -4,7 +4,7 @@ description: >
   Blip internal — Step 7: execute the implementation plan.
   Only invoked by the blip orchestrator agent.
 tools: ["read", "write", "edit", "bash"]
-model: claude-haiku-4.5
+model: MODEL_IMPLEMENT
 disable-model-invocation: true
 user-invocable: false
 ---

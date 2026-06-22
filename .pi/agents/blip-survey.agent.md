@@ -4,7 +4,7 @@ description: >
   Blip internal — Step 5: codebase survey. Runs after Step 2 (Understand).
   Only invoked by the blip orchestrator agent.
 tools: ["read", "grep", "find", "bash"]
-model: claude-sonnet-4.5
+model: MODEL_SURVEY
 disable-model-invocation: true
 user-invocable: false
 ---

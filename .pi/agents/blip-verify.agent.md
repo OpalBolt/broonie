@@ -4,7 +4,7 @@ description: >
   Blip internal — Step 9: verification cascade.
   Only invoked by the blip orchestrator agent.
 tools: ["bash", "read", "find"]
-model: claude-haiku-4.5
+model: MODEL_VERIFY
 disable-model-invocation: true
 user-invocable: false
 ---
