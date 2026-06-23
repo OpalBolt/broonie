@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -14,6 +15,9 @@ type Config struct {
 	DBPath        string
 	PollInterval  time.Duration
 	EncryptionKey [32]byte
+	MaxIterations int    // max retry loops for agent (default 3)
+	NonoProfile   string // path to nono profile JSON
+	ModelsPath    string // path to .pi/models.json for MODEL_ patching
 }
 
 // LoadConfig reads configuration from environment variables.
@@ -23,6 +27,9 @@ func LoadConfig() (Config, error) {
 	cfg := Config{
 		DBPath:       "./broonie.db",
 		PollInterval: 60 * time.Second,
+		MaxIterations: 3,
+		NonoProfile:   "nono/broonie-go.json",
+		ModelsPath:    ".pi/models.json",
 	}
 
 	cfg.SecretKey = os.Getenv("SECRET_KEY")
@@ -36,6 +43,20 @@ func LoadConfig() (Config, error) {
 		cfg.DBPath = path
 	}
 
+	if maxIter := os.Getenv("MAX_ITERATIONS"); maxIter != "" {
+		// ponytail: simple atoi, error treated as 0, falls back to default 3
+		if n, err := strconv.Atoi(maxIter); err == nil && n > 0 {
+			cfg.MaxIterations = n
+		}
+	}
+
+	if profile := os.Getenv("NONO_PROFILE"); profile != "" {
+		cfg.NonoProfile = profile
+	}
+
+	if models := os.Getenv("MODELS_PATH"); models != "" {
+		cfg.ModelsPath = models
+	}
 	cfg.EncryptionKey = sha256.Sum256([]byte(cfg.SecretKey))
 	return cfg, nil
 }

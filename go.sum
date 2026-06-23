@@ -1,3 +1,5 @@
+github.com/always-further/nono-go v0.21.0 h1:DWVKogzaNqIVABjRVn2rWzJB2S8CXQ5yDYvpKsouE/w=
+github.com/always-further/nono-go v0.21.0/go.mod h1:KMUPEDalxNtsTeX3952B2XADY4mPMSu0DsqG5PTFyhE=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
 github.com/google/go-cmp v0.5.2/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=

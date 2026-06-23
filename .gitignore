@@ -1,3 +1,4 @@
+.loop/
 .blip/
 broonie
 *.db
@@ -5,4 +6,5 @@ broonie
 *.db-wal
 helper/
 result/
+.blip/
 .blip/

@@ -11,6 +11,7 @@ import (
 
 	"github.com/OpalBolt/broonie/internal/config"
 	"github.com/OpalBolt/broonie/internal/db"
+	"github.com/OpalBolt/broonie/internal/executor"
 	"github.com/OpalBolt/broonie/internal/gh"
 )
 
@@ -80,6 +81,13 @@ func pollRepos(ctx context.Context, database *sql.DB, cfg config.Config) {
 
 		if issue != nil {
 			log.Printf("Selected %s/%s#%d: %s", repo.Owner, repo.Name, issue.IssueNumber, issue.Title)
+			// ponytail: serial execution — process one issue per poll cycle
+			if err := executor.Run(ctx, database, cfg, repo, issue); err != nil {
+				log.Printf("Executor error for %s/%s#%d: %v", repo.Owner, repo.Name, issue.IssueNumber, err)
+			}
+			// ponytail: after executing one issue, return to enforce serial execution;
+			// next poll cycle will pick up next pending issue
+			return
 		}
 	}
 }

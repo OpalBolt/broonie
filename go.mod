@@ -1,8 +1,9 @@
 module github.com/OpalBolt/broonie
 
-go 1.22
+go 1.24
 
 require (
+	github.com/always-further/nono-go v0.21.0
 	github.com/google/go-github/v62 v62.0.0
 	modernc.org/sqlite v1.28.0
 )

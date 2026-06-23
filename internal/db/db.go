@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS issues (
 	repo_id INTEGER REFERENCES repos(id),
 	issue_number INTEGER NOT NULL,
 	title TEXT,
+	body TEXT,
 	type TEXT DEFAULT 'AUTO',
 	status TEXT DEFAULT 'pending',
 	depends_on TEXT DEFAULT '[]',
@@ -65,6 +66,15 @@ CREATE INDEX IF NOT EXISTS idx_runs_issue_id ON runs(issue_id);
 		return nil, fmt.Errorf("create schema: %w", err)
 	}
 
+	// ponyail: migration — add columns that may be missing in existing databases
+	// Ignore errors if column already exists (SQLite doesn't support IF NOT EXISTS for ALTER TABLE)
+	migrations := []string{
+		"ALTER TABLE issues ADD COLUMN body TEXT",
+	}
+	for _, m := range migrations {
+		db.Exec(m) // best-effort, fails silently if column exists
+	}
+
 	return db, nil
 }
 
@@ -84,6 +94,7 @@ type Issue struct {
 	RepoID      int64
 	IssueNumber int
 	Title       string
+	Body        string
 	Type        string
 	Status      string
 	DependsOn   string
@@ -111,14 +122,15 @@ func ListActiveRepos(db *sql.DB) ([]Repo, error) {
 // UpsertIssue inserts or updates an issue in the database.
 func UpsertIssue(db *sql.DB, issue Issue) error {
 	_, err := db.Exec(`
-		INSERT INTO issues (repo_id, issue_number, title, type, status, depends_on)
-		VALUES (?, ?, ?, ?, ?, ?)
+		INSERT INTO issues (repo_id, issue_number, title, body, type, status, depends_on)
+		VALUES (?, ?, ?, ?, ?, ?, ?)
 		ON CONFLICT(repo_id, issue_number) DO UPDATE SET
 			title = excluded.title,
+			body = excluded.body,
 			type = excluded.type,
 			status = excluded.status,
 			depends_on = excluded.depends_on
-	`, issue.RepoID, issue.IssueNumber, issue.Title, issue.Type, issue.Status, issue.DependsOn)
+	`, issue.RepoID, issue.IssueNumber, issue.Title, issue.Body, issue.Type, issue.Status, issue.DependsOn)
 	return err
 }
 
@@ -126,12 +138,12 @@ func UpsertIssue(db *sql.DB, issue Issue) error {
 func GetPendingIssue(db *sql.DB, repoID int64) (*Issue, error) {
 	var i Issue
 	err := db.QueryRow(`
-		SELECT id, repo_id, issue_number, title, type, status, depends_on
+		SELECT id, repo_id, issue_number, title, body, type, status, depends_on
 		FROM issues
 		WHERE repo_id = ? AND status = 'pending' AND type = 'AUTO'
 		ORDER BY issue_number ASC
 		LIMIT 1
-	`, repoID).Scan(&i.ID, &i.RepoID, &i.IssueNumber, &i.Title, &i.Type, &i.Status, &i.DependsOn)
+	`, repoID).Scan(&i.ID, &i.RepoID, &i.IssueNumber, &i.Title, &i.Body, &i.Type, &i.Status, &i.DependsOn)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -160,4 +172,20 @@ func AreDepsDone(db *sql.DB, repoID int64, depNumbers []int) (bool, error) {
 		}
 	}
 	return true, nil
+}
+
+// UpdateIssueStatus sets the status of an issue.
+func UpdateIssueStatus(db *sql.DB, issueID int64, status string) error {
+	_, err := db.Exec("UPDATE issues SET status = ? WHERE id = ?", status, issueID)
+	return err
+}
+
+// InsertRun records an execution run for an issue.
+// startedAt and finishedAt are ISO 8601 strings.
+func InsertRun(db *sql.DB, issueID int64, iteration int, outcome, startedAt, finishedAt string) error {
+	_, err := db.Exec(
+		"INSERT INTO runs (issue_id, iteration, outcome, started_at, finished_at) VALUES (?, ?, ?, ?, ?)",
+		issueID, iteration, outcome, startedAt, finishedAt,
+	)
+	return err
 }
